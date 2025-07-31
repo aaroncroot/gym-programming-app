@@ -5,6 +5,13 @@ require('dotenv').config();
 
 const app = express();
 
+// Import routes
+const authRoutes = require('./routes/auth');
+const exerciseRoutes = require('./routes/exercises');
+const workoutRoutes = require('./routes/workouts');
+const programRoutes = require('./routes/programs');
+const uploadRoutes = require('./routes/upload');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -28,6 +35,16 @@ db.once('open', () => {
   console.log('✅ Connected to MongoDB successfully!');
 });
 
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/exercises', exerciseRoutes);
+app.use('/api/workouts', workoutRoutes);
+app.use('/api/programs', programRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Add this line to serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 // Basic route
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Gym App API is running!' });
@@ -41,5 +58,9 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`   Health check: http://localhost:${PORT}/api/health`);
+  console.log(` Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔐 Auth routes: http://localhost:${PORT}/api/auth`);
+  console.log(`💪 Exercise routes: http://localhost:${PORT}/api/exercises`);
+  console.log(`🏋️ Workout routes: http://localhost:${PORT}/api/workouts`);
+  console.log(`📋 Program routes: http://localhost:${PORT}/api/programs`);
 });
