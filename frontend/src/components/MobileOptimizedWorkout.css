@@ -1,0 +1,286 @@
+.mobile-workout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.mobile-workout.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.mobile-exercise-nav {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.exercise-progress {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  transition: width 0.3s ease;
+}
+
+.exercise-counter {
+  font-weight: bold;
+  font-size: 16px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.mobile-exercise-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.exercise-swipe-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.mobile-controls {
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.mobile-btn {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.mobile-btn.primary {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+}
+
+.mobile-btn.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mobile-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mobile-btn:active {
+  transform: scale(0.95);
+}
+
+/* Touch feedback */
+.mobile-btn:active {
+  transform: scale(0.95);
+}
+
+/* Swipe animations */
+.exercise-swipe-area {
+  transition: transform 0.3s ease;
+}
+
+.exercise-swipe-area.swiping {
+  transition: none;
+}
+
+/* Landscape optimizations */
+@media (orientation: landscape) {
+  .mobile-workout {
+    flex-direction: row;
+  }
+
+  .mobile-exercise-nav {
+    width: 200px;
+    height: 100%;
+    padding: 20px;
+  }
+
+  .mobile-exercise-content {
+    flex: 1;
+    padding: 30px;
+  }
+
+  .mobile-controls {
+    width: 200px;
+    height: 100%;
+    flex-direction: column;
+    padding: 20px;
+  }
+}
+
+/* High DPI optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mobile-btn {
+    border-width: 0.5px;
+  }
+} 
+
+/* Photo upload styles */
+.photo-upload-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.photo-upload-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.photo-upload-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.camera-btn,
+.gallery-btn {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.uploaded-photos {
+  margin-top: 15px;
+}
+
+.uploaded-photos h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.photo-preview {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Feedback photo styles */
+.feedback-photos-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.feedback-photos-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.photo-upload-controls {
+  margin-bottom: 15px;
+}
+
+.feedback-photos-preview {
+  margin-top: 15px;
+}
+
+.feedback-photos-preview h4 {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* Mobile optimizations for photo upload */
+@media (max-width: 768px) {
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .photo-upload-options {
+    flex-direction: column;
+  }
+  
+  .camera-btn,
+  .gallery-btn {
+    width: 100%;
+  }
+} 

@@ -99,6 +99,41 @@ const programSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  // NEW FIELDS FOR ENHANCED FEATURES
+  category: {
+    type: String,
+    enum: ['strength', 'hypertrophy', 'endurance', 'powerlifting', 'bodybuilding', 'general', 'custom'],
+    default: 'general'
+  },
+  difficulty: {
+    type: String,
+    enum: ['beginner', 'intermediate', 'advanced'],
+    default: 'beginner'
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  sharedFrom: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  sharedAt: {
+    type: Date,
+    required: false
+  },
+  templateId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Program',
+    required: false // For tracking which template a program was created from
+  },
+  completionRate: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0
+  },
   startDate: {
     type: Date,
     default: Date.now
@@ -132,6 +167,24 @@ programSchema.virtual('calculatedEndDate').get(function() {
   return null;
 });
 
+// Virtual for calculating progress percentage
+programSchema.virtual('progressPercentage').get(function() {
+  if (this.startDate && this.duration) {
+    const now = new Date();
+    const start = new Date(this.startDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + (this.duration * 7));
+    
+    if (now < start) return 0;
+    if (now > end) return 100;
+    
+    const totalDuration = end - start;
+    const elapsed = now - start;
+    return Math.round((elapsed / totalDuration) * 100);
+  }
+  return 0;
+});
+
 // Static method to find programs by trainer
 programSchema.statics.findByTrainer = function(trainerId) {
   return this.find({ trainer: trainerId }).populate('workouts.workout').populate('workouts.exercises.exercise');
@@ -145,6 +198,16 @@ programSchema.statics.findByClient = function(clientId) {
 // Static method to find template programs
 programSchema.statics.findTemplates = function() {
   return this.find({ isTemplate: true }).populate('workouts.workout').populate('workouts.exercises.exercise');
+};
+
+// Static method to find programs by category
+programSchema.statics.findByCategory = function(category) {
+  return this.find({ category, isTemplate: true }).populate('workouts.workout').populate('workouts.exercises.exercise');
+};
+
+// Static method to find programs by difficulty
+programSchema.statics.findByDifficulty = function(difficulty) {
+  return this.find({ difficulty, isTemplate: true }).populate('workouts.workout').populate('workouts.exercises.exercise');
 };
 
 // Method to get workouts for a specific week
@@ -179,6 +242,13 @@ programSchema.methods.assignToClient = function(clientId) {
   this.isTemplate = false;
   this.startDate = new Date();
   return this.save();
+};
+
+// Method to calculate completion rate
+programSchema.methods.calculateCompletionRate = function() {
+  // This would be implemented based on workout logging data
+  // For now, return a placeholder
+  return this.completionRate;
 };
 
 module.exports = mongoose.model('Program', programSchema); 

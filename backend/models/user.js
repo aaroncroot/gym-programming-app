@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -24,27 +25,75 @@ const userSchema = new mongoose.Schema({
     enum: ['trainer', 'client'],
     default: 'client'
   },
-  trainerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+  // Enhanced registration fields
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
   },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  location: {
+    country: {
+      type: String,
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    }
+  },
+  assignedTrainer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  // Verification fields
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  isApprovedByTrainer: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: {
+    type: String,
+    required: false
+  },
+  verificationTokenExpires: {
+    type: Date,
+    required: false
+  },
+  // Client-specific fields
+  pendingTrainerApproval: {
+    type: Boolean,
+    default: false
+  },
+  // Trainer-specific fields
   clients: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
-  trainerProfile: {
-    specialization: String,
-    experience: String,
-    certifications: [String]
-  },
-  clientProfile: {
-    goals: String,
-    fitnessLevel: String,
-    medicalNotes: String
-  },
+  // Timestamps
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  verifiedAt: {
+    type: Date,
+    required: false
+  },
+  approvedAt: {
+    type: Date,
+    required: false
   }
 });
 
@@ -61,7 +110,15 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Method to compare passwords
+// Generate verification token
+userSchema.methods.generateVerificationToken = function() {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.verificationToken = token;
+  this.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  return token;
+};
+
+// Compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };

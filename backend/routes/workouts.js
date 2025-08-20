@@ -4,6 +4,8 @@ const Workout = require('../models/Workout');
 const Exercise = require('../models/Exercise');
 const { auth, trainerOnly } = require('../middleware/auth');
 const router = express.Router();
+const WorkoutLog = require('../models/WorkoutLog');
+const mongoose = require('mongoose');
 
 // Helper function to handle async errors
 const asyncHandler = (fn) => (req, res, next) => {
@@ -256,6 +258,142 @@ router.post('/:id/assign', [
     success: true,
     message: 'Workout assigned to client successfully',
     data: updatedWorkout
+  });
+}));
+
+// @route   POST /api/workouts/log
+// @desc    Log a completed workout
+// @access  Private
+router.post('/log', auth, asyncHandler(async (req, res) => {
+  const {
+    workoutId,
+    programId,
+    exercises,
+    startTime,
+    endTime,
+    notes,
+    rating,
+    difficulty
+  } = req.body;
+
+  // Validate required fields
+  if (!exercises || !Array.isArray(exercises)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Exercises array is required'
+    });
+  }
+
+  // Create workout log
+  const workoutLog = new WorkoutLog({
+    user: req.user._id,
+    program: programId,
+    workout: workoutId,
+    exercises: exercises.map(exercise => ({
+      exercise: exercise.exerciseId,
+      sets: exercise.sets || [], // Array of individual set data
+      completed: exercise.completed,
+      notes: exercise.notes || ''
+    })),
+    startTime: startTime ? new Date(startTime) : new Date(),
+    endTime: endTime ? new Date(endTime) : new Date(),
+    notes: notes || '',
+    rating: rating || null,
+    difficulty: difficulty || null
+  });
+
+  await workoutLog.save();
+
+  const populatedLog = await WorkoutLog.findById(workoutLog._id)
+    .populate('program', 'name')
+    .populate('workout', 'name')
+    .populate('exercises.exercise', 'name category muscleGroup');
+
+  res.status(201).json({
+    success: true,
+    message: 'Workout logged successfully',
+    data: populatedLog
+  });
+}));
+
+// @route   GET /api/workouts/history
+// @desc    Get user's workout history
+// @access  Private
+router.get('/history', auth, asyncHandler(async (req, res) => {
+  const { limit = 50 } = req.query;
+  
+  const history = await WorkoutLog.getUserHistory(req.user._id, parseInt(limit));
+  
+  res.json({
+    success: true,
+    count: history.length,
+    data: history
+  });
+}));
+
+// Complete the stats endpoint
+router.get('/stats', auth, asyncHandler(async (req, res) => {
+  const { days = 30 } = req.query;
+  
+  const stats = await WorkoutLog.getUserStats(req.user._id, parseInt(days));
+  
+  res.json({
+    success: true,
+    data: stats[0] || {
+      totalWorkouts: 0,
+      totalDuration: 0,
+      averageRating: 0,
+      completedWorkouts: 0
+    }
+  });
+}));
+
+// @route   GET /api/workouts/progress/:exerciseId
+// @desc    Get user's progress for a specific exercise
+// @access  Private
+router.get('/progress/:exerciseId', auth, asyncHandler(async (req, res) => {
+  const { exerciseId } = req.params;
+  const { limit = 50 } = req.query;
+  
+  const progress = await WorkoutLog.aggregate([
+    {
+      $match: {
+        user: mongoose.Types.ObjectId(req.user._id),
+        'exercises.exercise': mongoose.Types.ObjectId(exerciseId)
+      }
+    },
+    {
+      $unwind: '$exercises'
+    },
+    {
+      $match: {
+        'exercises.exercise': mongoose.Types.ObjectId(exerciseId)
+      }
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
+        },
+        sets: { $push: '$exercises.sets' },
+        maxWeight: { $max: '$exercises.weight' },
+        maxReps: { $max: '$exercises.reps' },
+        totalSets: { $sum: 1 },
+        workoutId: { $first: '$_id' },
+        createdAt: { $first: '$createdAt' }
+      }
+    },
+    {
+      $sort: { _id: -1 }
+    },
+    {
+      $limit: parseInt(limit)
+    }
+  ]);
+  
+  res.json({
+    success: true,
+    data: progress
   });
 }));
 

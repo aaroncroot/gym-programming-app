@@ -8,7 +8,9 @@ function CreateProgram({ user, onBack }) {
     client: '',
     workoutsPerWeek: 3,
     duration: 4,
-    weeks: []
+    weeks: [],
+    isTemplate: false, // NEW: Track if this should be saved as template
+    templateName: '' // NEW: Name for template if saving as template
   });
   
   const [availableWorkouts, setAvailableWorkouts] = useState([]);
@@ -17,7 +19,6 @@ function CreateProgram({ user, onBack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState(1);
-  const [savingWorkout, setSavingWorkout] = useState(null);
   const [copiedWeek, setCopiedWeek] = useState(null);
   const [showPasteOption, setShowPasteOption] = useState(false);
 
@@ -204,17 +205,20 @@ function CreateProgram({ user, onBack }) {
               ...week,
               workouts: week.workouts.map((day, dIndex) => 
                 dIndex === dayIndex 
-                  ? {
-                      ...day,
-                      inlineExercises: [...day.inlineExercises, {
-                        exercise: '',
-                        sets: 3,
-                        reps: 10,
-                        weight: 0,
-                        duration: 0,
-                        restTime: 60,
-                        notes: ''
-                      }]
+                  ? { 
+                      ...day, 
+                      inlineExercises: [
+                        ...day.inlineExercises,
+                        {
+                          exercise: '',
+                          sets: 3,
+                          reps: 10,
+                          weight: '',
+                          duration: '',
+                          restTime: 60,
+                          notes: ''
+                        }
+                      ]
                     }
                   : day
               )
@@ -233,12 +237,12 @@ function CreateProgram({ user, onBack }) {
               ...week,
               workouts: week.workouts.map((day, dIndex) => 
                 dIndex === dayIndex 
-                  ? {
-                      ...day,
-                      inlineExercises: day.inlineExercises.map((exercise, eIndex) => 
-                        eIndex === exerciseIndex 
-                          ? { ...exercise, [field]: value }
-                          : exercise
+                  ? { 
+                      ...day, 
+                      inlineExercises: day.inlineExercises.map((ex, exIndex) => 
+                        exIndex === exerciseIndex 
+                          ? { ...ex, [field]: value }
+                          : ex
                       )
                     }
                   : day
@@ -258,9 +262,9 @@ function CreateProgram({ user, onBack }) {
               ...week,
               workouts: week.workouts.map((day, dIndex) => 
                 dIndex === dayIndex 
-                  ? {
-                      ...day,
-                      inlineExercises: day.inlineExercises.filter((_, eIndex) => eIndex !== exerciseIndex)
+                  ? { 
+                      ...day, 
+                      inlineExercises: day.inlineExercises.filter((_, exIndex) => exIndex !== exerciseIndex)
                     }
                   : day
               )
@@ -288,78 +292,7 @@ function CreateProgram({ user, onBack }) {
     }));
   };
 
-  const saveInlineWorkout = async (weekIndex, dayIndex) => {
-    const day = formData.weeks[weekIndex].workouts[dayIndex];
-    
-    if (!day.isInlineWorkout || day.inlineExercises.length === 0) {
-      return;
-    }
-
-    // Validate that all exercises have been selected
-    const hasEmptyExercises = day.inlineExercises.some(ex => !ex.exercise);
-    if (hasEmptyExercises) {
-      setError('Please select an exercise for all exercise items');
-      return;
-    }
-
-    setSavingWorkout(`${weekIndex}-${dayIndex}`);
-
-    try {
-      const token = localStorage.getItem('token');
-      
-      const workoutData = {
-        name: `Workout ${day.day} - Week ${weekIndex + 1}`,
-        description: `Inline workout created in program`,
-        exercises: day.inlineExercises.map(ex => ({
-          exercise: ex.exercise,
-          sets: ex.sets,
-          reps: ex.reps,
-          weight: ex.weight,
-          duration: ex.duration,
-          restTime: ex.restTime,
-          notes: ex.notes
-        }))
-      };
-
-      const response = await axios.post('http://localhost:5000/api/workouts', workoutData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.success) {
-        // Keep the inline workout visible but mark it as saved
-        setFormData(prev => ({
-          ...prev,
-          weeks: prev.weeks.map((week, wIndex) => 
-            wIndex === weekIndex 
-              ? {
-                  ...week,
-                  workouts: week.workouts.map((day, dIndex) => 
-                    dIndex === dayIndex 
-                      ? { 
-                          ...day, 
-                          isInlineWorkout: true,
-                          isSaved: true,
-                          savedWorkoutId: response.data.data._id
-                        }
-                      : day
-                  )
-                }
-              : week
-          )
-        }));
-        
-        // Refresh available workouts
-        await fetchWorkouts();
-      } else {
-        setError(response.data.message || 'Failed to save workout');
-      }
-    } catch (error) {
-      console.error('Error saving workout:', error);
-      setError(error.response?.data?.message || 'Failed to save workout');
-    } finally {
-      setSavingWorkout(null);
-    }
-  };
+  // REMOVED: saveInlineWorkout function - no longer needed
 
   const copyWeek = (weekIndex) => {
     setCopiedWeek(formData.weeks[weekIndex]);
@@ -396,6 +329,12 @@ function CreateProgram({ user, onBack }) {
       return;
     }
 
+    // If saving as template, require template name
+    if (formData.isTemplate && !formData.templateName) {
+      setError('Please provide a name for the template');
+      return;
+    }
+
     // Check if at least one workout is assigned
     const totalWorkouts = formData.weeks.reduce((total, week) => 
       total + week.workouts.filter(day => day.workout || day.isInlineWorkout).length, 0
@@ -418,7 +357,7 @@ function CreateProgram({ user, onBack }) {
         week.workouts.forEach((day, dayIndex) => {
           if (day.workout || day.isInlineWorkout) {
             if (day.isInlineWorkout) {
-              // Create inline workout data
+              // Create inline workout data (stays within program only)
               workouts.push({
                 week: weekIndex + 1,
                 day: dayIndex + 1,
@@ -440,12 +379,13 @@ function CreateProgram({ user, onBack }) {
       });
 
       const programData = {
-        name: formData.name,
+        name: formData.isTemplate ? formData.templateName : formData.name,
         description: formData.description,
-        client: formData.client || null,
+        client: formData.isTemplate ? null : (formData.client || null),
         workoutsPerWeek: formData.workoutsPerWeek,
         duration: formData.duration,
-        workouts: workouts
+        workouts: workouts,
+        isTemplate: formData.isTemplate // NEW: Send template flag
       };
 
       const response = await axios.post('http://localhost:5000/api/programs', programData, {
@@ -537,22 +477,54 @@ function CreateProgram({ user, onBack }) {
           </div>
         </div>
 
+        {/* NEW: Template Options */}
         <div className="form-group">
-          <label htmlFor="client">Assign to Client (Optional)</label>
-          <select
-            id="client"
-            name="client"
-            value={formData.client}
-            onChange={handleInputChange}
-          >
-            <option value="">Create as template (no client assigned)</option>
-            {clients.map(client => (
-              <option key={client._id} value={client._id}>
-                {client.username} ({client.email})
-              </option>
-            ))}
-          </select>
+          <label>
+            <input
+              type="checkbox"
+              name="isTemplate"
+              checked={formData.isTemplate}
+              onChange={(e) => setFormData(prev => ({ ...prev, isTemplate: e.target.checked }))}
+            />
+            Save as Template (for reuse with other clients)
+          </label>
         </div>
+
+        {formData.isTemplate && (
+          <div className="form-group">
+            <label htmlFor="templateName">Template Name *</label>
+            <input
+              type="text"
+              id="templateName"
+              name="templateName"
+              value={formData.templateName}
+              onChange={handleInputChange}
+              placeholder="e.g., Beginner Strength Program, Advanced Hypertrophy"
+              required
+            />
+            <small>This name will be used to identify the template in your program bank</small>
+          </div>
+        )}
+
+        {!formData.isTemplate && (
+          <div className="form-group">
+            <label htmlFor="client">Assign to Client (Optional)</label>
+            <select
+              id="client"
+              name="client"
+              value={formData.client}
+              onChange={handleInputChange}
+            >
+              <option value="">Create program without client assignment</option>
+              {clients.map(client => (
+                <option key={client._id} value={client._id}>
+                  {client.username} ({client.email})
+                </option>
+              ))}
+            </select>
+            <small>If no client is selected, the program will be saved in your program history</small>
+          </div>
+        )}
 
         <div className="program-schedule">
           <h3>Program Schedule</h3>
@@ -570,213 +542,183 @@ function CreateProgram({ user, onBack }) {
                 Week {week.weekNumber}
               </button>
             ))}
-            {showPasteOption && copiedWeek && (
-              <button
-                type="button"
-                className="paste-tab"
-                onClick={() => pasteWeek(activeTab - 1)}
-              >
-                📋 Paste Week {copiedWeek.weekNumber}
-              </button>
-            )}
           </div>
 
           {/* Week Content */}
           {formData.weeks.map((week, weekIndex) => (
-            <div 
-              key={weekIndex} 
+            <div
+              key={weekIndex}
               className={`week-content ${activeTab === week.weekNumber ? 'active' : ''}`}
             >
               <div className="week-header">
                 <h4>Week {week.weekNumber}</h4>
-                <button
-                  type="button"
-                  className="copy-btn"
-                  onClick={() => copyWeek(weekIndex)}
-                >
-                  📋 Copy Week
-                </button>
+                <div className="week-actions">
+                  <button
+                    type="button"
+                    onClick={() => copyWeek(weekIndex)}
+                    className="copy-btn"
+                  >
+                    Copy Week
+                  </button>
+                  {showPasteOption && (
+                    <button
+                      type="button"
+                      onClick={() => pasteWeek(weekIndex)}
+                      className="paste-btn"
+                    >
+                      Paste Week
+                    </button>
+                  )}
+                </div>
               </div>
-              
-              <div className="week-workouts">
-                {week.workouts.map((day, dayIndex) => (
-                  <div key={dayIndex} className="day-workout">
-                    <div className="day-header">
-                      <h5>Workout {day.day}</h5>
-                      {(day.workout || day.isInlineWorkout) && (
-                        <button
-                          type="button"
-                          onClick={() => removeWorkoutFromDay(weekIndex, dayIndex)}
-                          className="remove-btn"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                    
-                    <div className="workout-assignment">
-                      <select
-                        value={day.workout ? day.workout._id : (day.isInlineWorkout ? 'create-inline' : '')}
-                        onChange={(e) => assignWorkoutToDay(weekIndex, dayIndex, e.target.value)}
-                      >
-                        <option value="">Select a workout...</option>
-                        <option value="create-inline">➕ Create New Workout</option>
-                        {availableWorkouts.map(workout => (
-                          <option key={workout._id} value={workout._id}>
-                            {workout.name}
-                          </option>
-                        ))}
-                      </select>
-                      
-                      {day.workout && (
-                        <div className="assigned-workout">
-                          <strong>Assigned: {day.workout.name}</strong>
-                          <textarea
-                            placeholder="Notes for this workout..."
-                            value={day.notes}
-                            onChange={(e) => updateDayNotes(weekIndex, dayIndex, e.target.value)}
-                            rows="2"
-                          />
-                        </div>
-                      )}
 
-                      {day.isInlineWorkout && (
-                        <div className="inline-workout">
-                          <div className="inline-workout-header">
-                            <strong>
-                              Creating New Workout
-                              {day.isSaved && <span className="saved-badge"> ✓ Saved</span>}
-                            </strong>
-                            <div className="inline-workout-actions">
-                              <button
-                                type="button"
-                                onClick={() => addExerciseToInlineWorkout(weekIndex, dayIndex)}
-                                className="add-exercise-btn"
-                              >
-                                + Add Exercise
-                              </button>
-                              {!day.isSaved && (
-                                <button
-                                  type="button"
-                                  onClick={() => saveInlineWorkout(weekIndex, dayIndex)}
-                                  disabled={savingWorkout === `${weekIndex}-${dayIndex}`}
-                                  className="save-workout-btn"
-                                >
-                                  {savingWorkout === `${weekIndex}-${dayIndex}` ? 'Saving...' : '💾 Save Workout'}
-                                </button>
-                              )}
+              <div className="workout-grid">
+                {week.workouts.map((day, dayIndex) => (
+                  <div key={dayIndex} className="workout-day">
+                    <div className="workout-header">
+                      <h5>Workout {day.day}</h5>
+                      <div className="workout-actions">
+                        {day.workout || day.isInlineWorkout ? (
+                          <button
+                            type="button"
+                            onClick={() => removeWorkoutFromDay(weekIndex, dayIndex)}
+                            className="remove-btn"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <select
+                            value=""
+                            onChange={(e) => assignWorkoutToDay(weekIndex, dayIndex, e.target.value)}
+                            className="workout-select"
+                          >
+                            <option value="">Select workout...</option>
+                            <option value="create-inline">Create new workout</option>
+                            {availableWorkouts.map(workout => (
+                              <option key={workout._id} value={workout._id}>
+                                {workout.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    </div>
+
+                    {day.workout && (
+                      <div className="assigned-workout">
+                        <h6>{day.workout.name}</h6>
+                        <p>{day.workout.description}</p>
+                        <div className="exercise-list">
+                          {day.workout.exercises.map((exercise, index) => (
+                            <div key={index} className="exercise-item">
+                              <span className="exercise-name">{exercise.exercise.name}</span>
+                              <span className="exercise-details">
+                                {exercise.sets} sets × {exercise.reps} reps
+                                {exercise.weight && ` @ ${exercise.weight}kg`}
+                              </span>
                             </div>
-                          </div>
-                          
-                          {day.inlineExercises.map((exercise, exerciseIndex) => (
-                            <div key={exerciseIndex} className="inline-exercise">
-                              <div className="exercise-header">
-                                <h6>Exercise {exerciseIndex + 1}</h6>
-                                <button
-                                  type="button"
-                                  onClick={() => removeInlineExercise(weekIndex, dayIndex, exerciseIndex)}
-                                  className="remove-btn"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                              
-                              <div className="exercise-fields">
-                                <div className="form-group">
-                                  <label>Exercise *</label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {day.isInlineWorkout && (
+                      <div className="inline-workout">
+                        <div className="inline-workout-header">
+                          <h6>Custom Workout</h6>
+                          <button
+                            type="button"
+                            onClick={() => addExerciseToInlineWorkout(weekIndex, dayIndex)}
+                            className="add-exercise-btn"
+                          >
+                            + Add Exercise
+                          </button>
+                        </div>
+
+                        {day.inlineExercises.length === 0 ? (
+                          <p className="no-exercises">No exercises added yet. Click "Add Exercise" to start.</p>
+                        ) : (
+                          <div className="exercise-list">
+                            {day.inlineExercises.map((exercise, exerciseIndex) => (
+                              <div key={exerciseIndex} className="exercise-item">
+                                <div className="exercise-row">
                                   <select
                                     value={exercise.exercise}
                                     onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'exercise', e.target.value)}
+                                    className="exercise-select"
                                     required
                                   >
-                                    <option value="">Select an exercise...</option>
+                                    <option value="">Select exercise...</option>
                                     {availableExercises.map(ex => (
                                       <option key={ex._id} value={ex._id}>
-                                        {ex.name} ({ex.category})
+                                        {ex.name}
                                       </option>
                                     ))}
                                   </select>
-                                </div>
-
-                                <div className="form-row">
-                                  <div className="form-group">
-                                    <label>Sets *</label>
-                                    <input
-                                      type="number"
-                                      value={exercise.sets}
-                                      onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'sets', parseInt(e.target.value))}
-                                      min="1"
-                                      required
-                                    />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>Reps *</label>
-                                    <input
-                                      type="number"
-                                      value={exercise.reps}
-                                      onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'reps', parseInt(e.target.value))}
-                                      min="1"
-                                      required
-                                    />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>Weight (kg)</label>
-                                    <input
-                                      type="number"
-                                      value={exercise.weight}
-                                      onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'weight', parseFloat(e.target.value) || 0)}
-                                      min="0"
-                                      step="0.5"
-                                    />
-                                  </div>
-                                </div>
-
-                                <div className="form-row">
-                                  <div className="form-group">
-                                    <label>Duration (seconds)</label>
-                                    <input
-                                      type="number"
-                                      value={exercise.duration}
-                                      onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'duration', parseInt(e.target.value) || 0)}
-                                      min="0"
-                                    />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>Rest Time (seconds)</label>
-                                    <input
-                                      type="number"
-                                      value={exercise.restTime}
-                                      onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'restTime', parseInt(e.target.value) || 60)}
-                                      min="0"
-                                    />
-                                  </div>
-                                </div>
-
-                                <div className="form-group">
-                                  <label>Notes</label>
-                                  <textarea
-                                    value={exercise.notes}
-                                    onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'notes', e.target.value)}
-                                    rows="2"
-                                    placeholder="Any additional notes for this exercise..."
+                                  
+                                  <input
+                                    type="number"
+                                    value={exercise.sets}
+                                    onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'sets', parseInt(e.target.value))}
+                                    placeholder="Sets"
+                                    min="1"
+                                    className="exercise-input"
                                   />
+                                  
+                                  <input
+                                    type="number"
+                                    value={exercise.reps}
+                                    onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'reps', parseInt(e.target.value))}
+                                    placeholder="Reps"
+                                    min="1"
+                                    className="exercise-input"
+                                  />
+                                  
+                                  <input
+                                    type="number"
+                                    value={exercise.weight}
+                                    onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'weight', e.target.value)}
+                                    placeholder="Weight (kg)"
+                                    className="exercise-input"
+                                  />
+                                  
+                                  <input
+                                    type="number"
+                                    value={exercise.restTime}
+                                    onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'restTime', parseInt(e.target.value))}
+                                    placeholder="Rest (sec)"
+                                    min="0"
+                                    className="exercise-input"
+                                  />
+                                  
+                                  <button
+                                    type="button"
+                                    onClick={() => removeInlineExercise(weekIndex, dayIndex, exerciseIndex)}
+                                    className="remove-exercise-btn"
+                                  >
+                                    ×
+                                  </button>
                                 </div>
+                                
+                                <textarea
+                                  value={exercise.notes}
+                                  onChange={(e) => updateInlineExercise(weekIndex, dayIndex, exerciseIndex, 'notes', e.target.value)}
+                                  placeholder="Notes (optional)"
+                                  className="exercise-notes"
+                                />
                               </div>
-                            </div>
-                          ))}
-                          
-                          <textarea
-                            placeholder="Notes for this workout..."
-                            value={day.notes}
-                            onChange={(e) => updateDayNotes(weekIndex, dayIndex, e.target.value)}
-                            rows="2"
-                          />
-                        </div>
-                      )}
-                    </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <textarea
+                      value={day.notes}
+                      onChange={(e) => updateDayNotes(weekIndex, dayIndex, e.target.value)}
+                      placeholder="Workout notes (optional)"
+                      className="workout-notes"
+                    />
                   </div>
                 ))}
               </div>
@@ -785,11 +727,8 @@ function CreateProgram({ user, onBack }) {
         </div>
 
         <div className="form-actions">
-          <button type="button" onClick={onBack} className="cancel-btn">
-            Cancel
-          </button>
           <button type="submit" disabled={loading} className="submit-btn">
-            {loading ? 'Creating...' : 'Create Program'}
+            {loading ? 'Creating...' : formData.isTemplate ? 'Save as Template' : 'Create Program'}
           </button>
         </div>
       </form>

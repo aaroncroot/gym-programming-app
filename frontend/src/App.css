@@ -2430,3 +2430,993 @@
     align-items: stretch;
   }
 }
+
+/* Mobile-First Responsive Design */
+
+/* Base mobile styles */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  .App-header {
+    padding: 15px 10px;
+  }
+
+  .App-header h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  /* Dashboard improvements */
+  .user-dashboard {
+    padding: 10px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  /* Navigation improvements */
+  .navigation-tabs {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .navigation-tabs button {
+    font-size: 14px;
+    padding: 10px 12px;
+    min-width: auto;
+    flex: 1;
+    max-width: 120px;
+    border-radius: 8px;
+  }
+
+  /* Card improvements */
+  .stat-card {
+    min-width: 140px;
+    padding: 15px;
+    margin: 5px;
+  }
+
+  .stat-card h3 {
+    font-size: 14px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  /* Form improvements */
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Button improvements */
+  .btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+
+  /* Modal improvements */
+  .modal-content {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 15px;
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  /* Exercise card improvements */
+  .exercise-card {
+    flex-direction: column;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .exercise-info {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .exercise-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Workout execution improvements */
+  .workout-execution {
+    padding: 10px;
+  }
+
+  .exercise-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .exercise-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .video-section {
+    margin: 15px 0;
+  }
+
+  .exercise-video {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .set-inputs {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .set-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .set-input-group input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  /* Progress tracking improvements */
+  .progress-section {
+    padding: 15px;
+    margin: 10px 0;
+  }
+
+  .progress-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .progress-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .progress-input-group input {
+    flex: 1;
+    padding: 10px;
+  }
+
+  /* Analytics improvements */
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+
+  /* Messaging improvements */
+  .messaging-container {
+    flex-direction: column;
+    height: calc(100vh - 200px);
+  }
+
+  .conversation-list {
+    width: 100%;
+    height: 200px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .message-area {
+    width: 100%;
+    height: calc(100% - 200px);
+  }
+
+  .message-input {
+    padding: 10px;
+  }
+
+  .input-container {
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-container input {
+    flex: 1;
+    padding: 12px;
+  }
+
+  /* Feedback modal improvements */
+  .feedback-modal .modal-content {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+
+  .rating-stars {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .star-btn {
+    font-size: 24px;
+    padding: 5px;
+  }
+
+  /* History modal improvements */
+  .history-modal .modal-content {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+
+  .history-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  /* Tab improvements */
+  .tab-container {
+    margin-bottom: 20px;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .tab-button {
+    white-space: nowrap;
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  /* Loading states */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .navigation-tabs {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navigation-tabs button {
+    font-size: 15px;
+    padding: 12px 16px;
+  }
+
+  .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .exercise-card {
+    flex-direction: row;
+  }
+
+  .exercise-info {
+    width: 70%;
+  }
+
+  .exercise-actions {
+    width: 30%;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1025px) {
+  .App {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .navigation-tabs {
+    justify-content: center;
+  }
+
+  .analytics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .navigation-tabs button,
+  .tab-button {
+    min-height: 44px; /* iOS recommended touch target */
+  }
+
+  .exercise-actions button {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  .modal-actions button {
+    min-height: 44px;
+    padding: 12px 20px;
+  }
+
+  /* Increase spacing for touch targets */
+  .set-input-group {
+    gap: 12px;
+  }
+
+  .progress-input-group {
+    gap: 12px;
+  }
+}
+
+/* Landscape orientation fixes */
+@media (max-width: 768px) and (orientation: landscape) {
+  .workout-execution {
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .exercise-section {
+    margin-bottom: 15px;
+  }
+
+  .video-section {
+    margin: 10px 0;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .exercise-video {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .App {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .modal-content {
+    background-color: #2d2d2d;
+    color: #ffffff;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background-color: #3d3d3d;
+    color: #ffffff;
+    border-color: #555;
+  }
+}
+
+/* ========================================
+   ENHANCED DARK THEME - FORM ELEMENTS
+   ======================================== */
+
+/* Enhanced Input Fields */
+.auth-form input,
+.form-group input,
+.search-box input,
+.video-url-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 16px;
+  background: #2a2a2a; /* Darker background */
+  color: #ffffff; /* Bright white text */
+  transition: all 0.3s;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.auth-form input:focus,
+.form-group input:focus,
+.search-box input:focus,
+.video-url-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background: #333333; /* Slightly lighter when focused */
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Enhanced Select Dropdowns */
+.auth-form select,
+.form-group select,
+.filter-options select,
+.video-manager-filters select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 16px;
+  background: #2a2a2a; /* Darker background */
+  color: #ffffff; /* Bright white text */
+  cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.auth-form select:focus,
+.form-group select:focus,
+.filter-options select:focus,
+.video-manager-filters select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background: #333333;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Enhanced Dropdown Options */
+.auth-form select option,
+.form-group select option,
+.filter-options select option,
+.video-manager-filters select option {
+  background: #1a1a1a; /* Very dark background */
+  color: #ffffff; /* Bright white text */
+  padding: 8px;
+}
+
+.auth-form select option:hover,
+.form-group select option:hover,
+.filter-options select option:hover,
+.video-manager-filters select option:hover {
+  background: #333333; /* Slightly lighter on hover */
+}
+
+/* Enhanced Textarea */
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 16px;
+  background: #2a2a2a; /* Darker background */
+  color: #ffffff; /* Bright white text */
+  resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background: #333333;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Enhanced Placeholder Text */
+.auth-form input::placeholder,
+.form-group input::placeholder,
+.search-box input::placeholder,
+.video-url-input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7); /* Brighter placeholder text */
+}
+
+/* Enhanced Form Containers */
+.auth-form,
+.form-group,
+.search-box,
+.filters,
+.library-header {
+  background: rgba(0, 0, 0, 0.4); /* Darker container backgrounds */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+/* Enhanced Labels */
+.auth-form label,
+.form-group label {
+  color: #e0e0e0; /* Brighter label text */
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Enhanced Buttons */
+.auth-form button,
+.form-group button,
+.submit-btn,
+.cancel-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 12px 20px;
+  font-weight: 500;
+}
+
+.auth-form button:hover,
+.form-group button:hover,
+.submit-btn:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.cancel-btn {
+  background: #666;
+}
+
+.cancel-btn:hover {
+  background: #555;
+}
+
+/* Enhanced Error Messages */
+.error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.15); /* Darker error background */
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+/* Enhanced Success Messages */
+.success {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.15); /* Darker success background */
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+/* Enhanced Modal Backgrounds */
+.modal-content,
+.create-workout-modal,
+.create-program-page {
+  background: #1a1a1a; /* Very dark modal backgrounds */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+}
+
+/* Enhanced Card Backgrounds */
+.exercise-card,
+.program-card,
+.workout-card {
+  background: rgba(0, 0, 0, 0.6); /* Darker card backgrounds */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+/* Enhanced Navigation */
+.navigation-tabs button {
+  background: rgba(0, 0, 0, 0.4); /* Darker tab backgrounds */
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 16px;
+}
+
+.navigation-tabs button.active {
+  background: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
+}
+
+.navigation-tabs button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   REMOVE WHITE BORDERS - SEAMLESS DARK THEME
+   ======================================== */
+
+/* Remove white borders from all containers */
+.auth-form,
+.form-group,
+.search-box,
+.filters,
+.library-header,
+.modal-content,
+.create-workout-modal,
+.create-program-page,
+.exercise-card,
+.program-card,
+.workout-card,
+.navigation-tabs button {
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Almost invisible dark borders */
+  background: rgba(0, 0, 0, 0.6); /* Darker, more consistent backgrounds */
+}
+
+/* Enhanced dark containers with subtle borders */
+.content-box,
+.info-box,
+.status-box {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+/* Program template cards - make them darker */
+.program-template-card,
+.workout-card,
+.exercise-item {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+/* Dropdown containers - seamless dark */
+.select-container,
+.dropdown-wrapper {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+/* Form sections - completely seamless */
+.form-section,
+.input-group,
+.field-group {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+/* ========================================
+   COMPLETE DARK THEME - ANALYTICS & MESSAGES
+   ======================================== */
+
+/* Analytics Dashboard - Dark Metric Boxes */
+.analytics-dashboard .metric-box,
+.analytics-dashboard .stat-card,
+.analytics-dashboard .metric-card,
+.analytics-dashboard .performance-box {
+  background: #1a1a1a !important; /* Very dark background */
+  border: 1px solid rgba(255, 255, 255, 0.05) !important; /* Almost invisible borders */
+  color: #ffffff !important; /* White text */
+}
+
+/* Specific Analytics Elements */
+.analytics-header,
+.analytics-overview,
+.analytics-section {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Performance Charts and Graphs */
+.performance-chart,
+.chart-container,
+.graph-wrapper {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Messages Page - Dark Theme */
+.messages-container,
+.conversation-list,
+.message-content,
+.chat-container {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Message Sidebar */
+.messages-sidebar,
+.conversation-sidebar {
+  background: #2a2a2a !important; /* Slightly lighter for sidebar */
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Message Input Areas */
+.message-input,
+.chat-input,
+.compose-message {
+  background: #2a2a2a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Assign Programs Page - Dark Theme */
+.assign-programs-container,
+.program-assignment-box,
+.client-selection-box,
+.template-selection-box {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Program Template Cards */
+.program-template-card,
+.workout-template-card,
+.exercise-template-card {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Client Management Boxes */
+.client-management-box,
+.approved-clients-box,
+.pending-clients-box {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dashboard Cards and Boxes */
+.dashboard-card,
+.info-box,
+.status-box,
+.content-box {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Form Sections */
+.form-section,
+.input-section,
+.selection-section {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dropdown Containers */
+.dropdown-container,
+.select-wrapper,
+.choice-container {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Time Period Selector */
+.time-period-selector,
+.period-dropdown,
+.date-range-selector {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Revenue and Stats Display */
+.revenue-display,
+.stats-display,
+.metrics-display {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Client Progress Section */
+.client-progress-section,
+.program-performance-section {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Empty State Messages */
+.empty-state,
+.no-data-message,
+.placeholder-text {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Override any remaining white backgrounds */
+*[style*="background: white"],
+*[style*="background-color: white"],
+*[style*="background: #fff"],
+*[style*="background: #ffffff"] {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Override any remaining white borders */
+*[style*="border-color: white"],
+*[style*="border: 1px solid white"] {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Ensure all text is readable */
+.analytics-dashboard *,
+.messages-container *,
+.assign-programs-container * {
+  color: #ffffff !important;
+}
+
+/* Specific text elements that might be dark */
+.analytics-dashboard .metric-value,
+.analytics-dashboard .stat-number,
+.analytics-dashboard .performance-text {
+  color: #ffffff !important;
+}
+
+/* Override any inline styles */
+[style*="color: black"],
+[style*="color: #000"],
+[style*="color: #333"] {
+  color: #ffffff !important;
+}
+
+/* ========================================
+   COMPLETE DARK THEME - FINAL CLEANUP
+   ======================================== */
+
+/* Ensure all containers are dark */
+.client-management,
+.management-section,
+.client-card,
+.available-client-card,
+.assign-client-form,
+.client-email-input,
+.assign-btn,
+.remove-btn {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Dark theme for all form elements */
+.client-email-input,
+.assign-btn,
+.remove-btn {
+  background: #2a2a2a !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.client-email-input:focus {
+  background: #333333 !important;
+  border-color: #4CAF50 !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2) !important;
+}
+
+/* Button hover states */
+.assign-btn:hover {
+  background: #45a049 !important;
+}
+
+.remove-btn:hover {
+  background: #d32f2f !important;
+}
+
+/* Ensure all text is readable */
+.client-management *,
+.management-section * {
+  color: #ffffff !important;
+}
+
+.client-info h4,
+.client-info p,
+.client-info small {
+  color: #ffffff !important;
+}
+
+/* Dark theme for any remaining white elements */
+*[style*="background: white"],
+*[style*="background-color: white"],
+*[style*="background: #fff"],
+*[style*="background: #ffffff"] {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Override any remaining white borders */
+*[style*="border-color: white"],
+*[style*="border: 1px solid white"] {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Ensure consistent dark backgrounds */
+.content-container,
+.main-content,
+.app-container {
+  background: #1a1a1a !important;
+}
+
+/* Dark theme for any modals or overlays */
+.modal,
+.overlay,
+.popup {
+  background: rgba(0, 0, 0, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark theme for dropdowns and selects */
+select,
+option,
+.dropdown,
+.select-container {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+select option {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+select option:hover {
+  background: #333333 !important;
+}
