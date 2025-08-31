@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function ExerciseCard({ exercise, user, onUpdate }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -9,22 +10,19 @@ function ExerciseCard({ exercise, user, onUpdate }) {
   const [isUpdatingVideo, setIsUpdatingVideo] = useState(false);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this exercise?')) {
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/exercises/${exercise._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      onUpdate();
-    } catch (error) {
-      console.error('Error deleting exercise:', error);
-      alert('Failed to delete exercise');
-    } finally {
-      setIsDeleting(false);
+    if (window.confirm('Are you sure you want to delete this exercise?')) {
+      try {
+        setIsDeleting(true);
+        await axios.delete(`${API_BASE_URL}/api/exercises/${exercise._id}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        onUpdate();
+      } catch (error) {
+        console.error('Error deleting exercise:', error);
+        alert('Failed to delete exercise');
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -32,7 +30,7 @@ function ExerciseCard({ exercise, user, onUpdate }) {
     try {
       setIsUpdatingVideo(true);
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/exercises/${exercise._id}`, {
+      await axios.put(`${API_BASE_URL}/api/exercises/${exercise._id}`, {
         videoUrl: videoUrl
       }, {
         headers: { Authorization: `Bearer ${token}` }

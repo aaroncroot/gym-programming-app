@@ -1,26 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-const ClientManagement = () => {
+function ClientManagement() {
   const [clients, setClients] = useState([]);
   const [availableClients, setAvailableClients] = useState([]);
+  const [newClientEmail, setNewClientEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [newClientEmail, setNewClientEmail] = useState('');
 
-  useEffect(() => {
-    fetchMyClients();
-    fetchAvailableClients();
-  }, []);
-
+  // Move these functions OUTSIDE of useEffect so they can be called from anywhere
   const fetchMyClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/trainer/clients', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_BASE_URL}/api/auth/trainer/clients`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      setClients(response.data.data || []);
+      setClients(response.data.clients || []);
     } catch (error) {
       console.error('Error fetching my clients:', error);
     }
@@ -28,26 +24,29 @@ const ClientManagement = () => {
 
   const fetchAvailableClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/trainer/available-clients', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_BASE_URL}/api/auth/trainer/available-clients`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      setAvailableClients(response.data.data || []);
+      setAvailableClients(response.data.clients || []);
     } catch (error) {
       console.error('Error fetching available clients:', error);
     }
   };
 
-  const assignClient = async (clientEmail) => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  useEffect(() => {
+    fetchMyClients();
+    fetchAvailableClients();
+  }, []);
 
+  const handleAssignClient = async (clientEmail) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/auth/trainer/clients', 
-        { clientEmail },
-        { headers: { Authorization: `Bearer ${token}` } }
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      
+      const response = await axios.post(`${API_BASE_URL}/api/auth/trainer/clients`,
+        { clientEmail: clientEmail },
+        { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
       );
       
       setSuccess('Client assigned successfully!');
@@ -61,7 +60,7 @@ const ClientManagement = () => {
     }
   };
 
-  const removeClient = async (clientId) => {
+  const handleRemoveClient = async (clientId) => {
     if (!window.confirm('Are you sure you want to remove this client?')) {
       return;
     }
@@ -72,7 +71,7 @@ const ClientManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/auth/trainer/clients/${clientId}`, {
+      await axios.delete(`${API_BASE_URL}/api/auth/trainer/clients/${clientId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -113,7 +112,7 @@ const ClientManagement = () => {
             className="client-email-input"
           />
           <button 
-            onClick={() => assignClient(newClientEmail)}
+            onClick={() => handleAssignClient(newClientEmail)}
             disabled={loading || !newClientEmail}
             className="assign-btn"
           >
@@ -136,7 +135,7 @@ const ClientManagement = () => {
                   <small>Joined: {new Date(client.createdAt).toLocaleDateString()}</small>
                 </div>
                 <button 
-                  onClick={() => removeClient(client._id)}
+                  onClick={() => handleRemoveClient(client._id)}
                   className="remove-btn"
                   disabled={loading}
                 >
@@ -162,7 +161,7 @@ const ClientManagement = () => {
                   <small>Joined: {new Date(client.createdAt).toLocaleDateString()}</small>
                 </div>
                 <button 
-                  onClick={() => assignClient(client.email)}
+                  onClick={() => handleAssignClient(client.email)}
                   className="assign-btn"
                   disabled={loading}
                 >

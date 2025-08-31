@@ -4,6 +4,7 @@ import ExerciseCard from './ExerciseCard';
 import CreateExercise from './CreateExercise';
 import VideoManager from './VideoManager';
 import ExerciseListItem from './ExerciseListItem';
+import { API_BASE_URL } from '../config';
 
 function ExerciseLibrary({ user }) {
   const [exercises, setExercises] = useState([]);
@@ -15,19 +16,14 @@ function ExerciseLibrary({ user }) {
   const [filterMuscleGroup, setFilterMuscleGroup] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchExercises();
-  }, []);
-
   const fetchExercises = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/exercises', {
+      const response = await axios.get(`${API_BASE_URL}/api/exercises`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Handle new response structure
       if (response.data.success) {
         setExercises(response.data.data || []);
       } else {
@@ -42,10 +38,14 @@ function ExerciseLibrary({ user }) {
     }
   };
 
+  useEffect(() => {
+    fetchExercises();
+  }, []);
+
   const handleCreateExercise = async (exerciseData) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/exercises', exerciseData, {
+      const response = await axios.post(`${API_BASE_URL}/api/exercises`, exerciseData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

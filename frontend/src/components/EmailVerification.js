@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './EmailVerification.css';
+import { API_BASE_URL } from '../config';
 
 function EmailVerification() {
   const [verificationStatus, setVerificationStatus] = useState('verifying');
@@ -23,7 +24,7 @@ function EmailVerification() {
   const verifyEmail = async (token) => {
     try {
       setVerificationStatus('verifying');
-      const response = await axios.get(`http://localhost:5000/api/auth/verify-email?token=${token}`);
+      const response = await axios.get(`${API_BASE_URL}/api/auth/verify-email?token=${token}`);
       
       if (response.data.success) {
         setVerificationStatus('success');
@@ -41,7 +42,7 @@ function EmailVerification() {
 
   const resendVerification = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/resend-verification', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/resend-verification`, {
         email: user?.email
       });
       

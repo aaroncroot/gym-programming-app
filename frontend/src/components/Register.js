@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import './Register.css';
 
 function Register({ onRegister }) {
@@ -28,28 +29,28 @@ function Register({ onRegister }) {
 
   // Load trainers and countries on component mount
   useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/trainers`);
+        setTrainers(response.data.trainers);
+        setFilteredTrainers(response.data.trainers);
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+      }
+    };
+
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/countries`);
+        setCountries(response.data.countries);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
+    };
+
     fetchTrainers();
     fetchCountries();
   }, []);
-
-  const fetchTrainers = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/auth/trainers');
-      setTrainers(response.data.trainers);
-      setFilteredTrainers(response.data.trainers);
-    } catch (error) {
-      console.error('Error fetching trainers:', error);
-    }
-  };
-
-  const fetchCountries = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/auth/countries');
-      setCountries(response.data.countries);
-    } catch (error) {
-      console.error('Error fetching countries:', error);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -159,7 +160,7 @@ function Register({ onRegister }) {
         selectedTrainer: formData.selectedTrainer
       };
 
-      const response = await axios.post('http://localhost:5000/api/auth/register', registrationData);
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, registrationData);
       
       if (response.data.success) {
         setStep(3); // Show confirmation step

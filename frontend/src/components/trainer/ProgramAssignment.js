@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ProgramAssignment.css';
+import { API_BASE_URL } from '../../config';
 
 const ProgramAssignment = ({ user }) => {
   const [approvedClients, setApprovedClients] = useState([]);
@@ -10,6 +11,8 @@ const ProgramAssignment = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState(false);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -19,10 +22,10 @@ const ProgramAssignment = ({ user }) => {
     try {
       setLoading(true);
       const [clientsResponse, templatesResponse] = await Promise.all([
-        axios.get('http://localhost:5000/api/auth/trainer/clients', {
+        axios.get(`${API_BASE_URL}/api/auth/trainer/clients`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }),
-        axios.get('http://localhost:5000/api/programs/templates', {
+        axios.get(`${API_BASE_URL}/api/programs/templates`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
       ]);
@@ -37,25 +40,24 @@ const ProgramAssignment = ({ user }) => {
     }
   };
 
-  const handleAssignProgram = async (e) => {
-    e.preventDefault();
-    
-    if (!selectedClient || !selectedTemplate) {
-      setMessage('Please select both a client and a program template');
+  const handleAssignProgram = async () => {
+    if (!selectedTemplate || !selectedClient) {
+      setError('Please select both a template and a client');
       return;
     }
 
     try {
       setAssigning(true);
-      setMessage('');
+      setError('');
+      setSuccess('');
 
-      const response = await axios.post(`http://localhost:5000/api/programs/${selectedTemplate}/assign`, {
+      const response = await axios.post(`${API_BASE_URL}/api/programs/${selectedTemplate}/assign`, {
         clientId: selectedClient
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      setMessage('Program assigned successfully!');
+      setSuccess('Program assigned successfully!');
       setSelectedClient('');
       setSelectedTemplate('');
       
@@ -63,7 +65,7 @@ const ProgramAssignment = ({ user }) => {
       fetchData();
     } catch (error) {
       console.error('Error assigning program:', error);
-      setMessage(error.response?.data?.message || 'Failed to assign program');
+      setError(error.response?.data?.message || 'Failed to assign program');
     } finally {
       setAssigning(false);
     }

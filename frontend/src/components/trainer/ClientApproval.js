@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ClientApproval.css';
+import { API_BASE_URL } from '../../config';
 
 const ClientApproval = () => {
   const [pendingClients, setPendingClients] = useState([]);
@@ -13,18 +14,13 @@ const ClientApproval = () => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [clientFeedback, setClientFeedback] = useState([]);
-
-  useEffect(() => {
-    fetchPendingClients();
-    fetchApprovedClients();
-    fetchUnreadFeedbackCount();
-  }, []);
+  const [approving, setApproving] = useState(null);
+  const [rejecting, setRejecting] = useState(null);
 
   const fetchPendingClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/trainer/pending-clients', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_BASE_URL}/api/auth/trainer/pending-clients`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       setPendingClients(response.data.clients || []);
     } catch (error) {
@@ -35,9 +31,8 @@ const ClientApproval = () => {
 
   const fetchApprovedClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/trainer/clients', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_BASE_URL}/api/auth/trainer/clients`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       setApprovedClients(response.data.clients || []);
     } catch (error) {
@@ -47,19 +42,37 @@ const ClientApproval = () => {
 
   const fetchUnreadFeedbackCount = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/feedback/unread-count', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const response = await axios.get(`${API_BASE_URL}/api/feedback/unread-count`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      setUnreadFeedbackCount(response.data.data.count);
+      setUnreadFeedbackCount(response.data.data.count || 0);
     } catch (error) {
       console.error('Error fetching unread feedback count:', error);
     }
   };
 
+  const fetchFeedback = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/feedback`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      setClientFeedback(response.data.feedback || []);
+    } catch (error) {
+      console.error('Error fetching feedback:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingClients();
+    fetchApprovedClients();
+    fetchUnreadFeedbackCount();
+    fetchFeedback();
+  }, []);
+
   const handleClientClick = async (client) => {
     setSelectedClient(client);
     try {
-      const response = await axios.get('http://localhost:5000/api/feedback', {
+      const response = await axios.get(`${API_BASE_URL}/api/feedback`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const allFeedback = response.data.data;
@@ -73,82 +86,66 @@ const ClientApproval = () => {
 
   const markFeedbackAsRead = async (feedbackId) => {
     try {
-      await axios.put(`http://localhost:5000/api/feedback/${feedbackId}/read`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      await axios.put(`${API_BASE_URL}/api/feedback/${feedbackId}/read`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      // Refresh unread count
       await fetchUnreadFeedbackCount();
+      await fetchFeedback();
     } catch (error) {
       console.error('Error marking feedback as read:', error);
     }
   };
 
-  const approveClient = async (clientId) => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
+  const handleApproveClient = async (clientId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:5000/api/auth/trainer/approve-client/${clientId}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      setApproving(clientId);
+      setError('');
+      setSuccess('');
+
+      const response = await axios.post(`${API_BASE_URL}/api/auth/trainer/approve-client/${clientId}`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       setSuccess('Client approved successfully!');
       fetchPendingClients();
       fetchApprovedClients();
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to approve client');
     } finally {
-      setLoading(false);
+      setApproving(null);
     }
   };
 
-  const rejectClient = async (clientId) => {
-    if (!window.confirm('Are you sure you want to reject this client request?')) {
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
+  const handleRejectClient = async (clientId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:5000/api/auth/trainer/reject-client/${clientId}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      setRejecting(clientId);
+      setError('');
+      setSuccess('');
+
+      const response = await axios.post(`${API_BASE_URL}/api/auth/trainer/reject-client/${clientId}`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       setSuccess('Client request rejected');
       fetchPendingClients();
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to reject client');
     } finally {
-      setLoading(false);
+      setRejecting(null);
     }
   };
 
-  const removeClient = async (clientId) => {
-    if (!window.confirm('Are you sure you want to remove this client from your client list?')) {
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/auth/trainer/clients/${clientId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setSuccess('Client removed successfully!');
-      fetchApprovedClients();
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to remove client');
-    } finally {
-      setLoading(false);
+  const handleRemoveClient = async (clientId) => {
+    if (window.confirm('Are you sure you want to remove this client?')) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/auth/trainer/clients/${clientId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        setSuccess('Client removed successfully!');
+        fetchApprovedClients();
+      } catch (error) {
+        setError(error.response?.data?.message || 'Failed to remove client');
+      }
     }
   };
 
@@ -179,17 +176,17 @@ const ClientApproval = () => {
       <div className="client-actions">
         <button 
           className="btn-approve"
-          onClick={() => approveClient(client._id)}
-          disabled={loading}
+          onClick={() => handleApproveClient(client._id)}
+          disabled={loading || approving === client._id}
         >
-          ✅ Approve Client
+          {approving === client._id ? 'Approving...' : '✅ Approve Client'}
         </button>
         <button 
           className="btn-reject"
-          onClick={() => rejectClient(client._id)}
-          disabled={loading}
+          onClick={() => handleRejectClient(client._id)}
+          disabled={loading || rejecting === client._id}
         >
-          ❌ Reject Request
+          {rejecting === client._id ? 'Rejecting...' : '❌ Reject Request'}
         </button>
       </div>
     </div>
@@ -234,7 +231,7 @@ const ClientApproval = () => {
         </button>
         <button 
           className="btn-remove"
-          onClick={() => removeClient(client._id)}
+          onClick={() => handleRemoveClient(client._id)}
           disabled={loading}
         >
           🗑️ Remove Client

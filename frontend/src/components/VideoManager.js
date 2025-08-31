@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function VideoManager({ user, onClose }) {
   const [exercises, setExercises] = useState([]);
@@ -11,26 +12,21 @@ function VideoManager({ user, onClose }) {
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    fetchExercises();
+    const fetchExercises = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/exercises`);
+        setExercises(response.data.exercises || []);
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+      }
+    };
   }, []);
 
-  const fetchExercises = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/exercises');
-      setExercises(response.data);
-    } catch (error) {
-      console.error('Error fetching exercises:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVideoUpdate = async (exerciseId) => {
+  const handleVideoUpdate = async (exerciseId, videoUrl) => {
     try {
       setIsUpdating(true);
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/exercises/${exerciseId}`, {
+      await axios.put(`${API_BASE_URL}/api/exercises/${exerciseId}`, {
         videoUrl: videoUrl
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -196,7 +192,7 @@ function VideoManager({ user, onClose }) {
                       />
                       <div className="edit-buttons">
                         <button 
-                          onClick={() => handleVideoUpdate(exercise._id)}
+                          onClick={() => handleVideoUpdate(exercise._id, videoUrl)}
                           disabled={isUpdating}
                           className="save-btn"
                         >

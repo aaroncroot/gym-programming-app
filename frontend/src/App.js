@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import axios from 'axios';
+import { AppProvider, useApp } from './contexts/AppContext';
 import Login from './components/Login';
 import Register from './components/Register';
 import ExerciseLibrary from './components/ExerciseLibrary';
@@ -21,61 +22,47 @@ import MobileOptimizedWorkout from './components/MobileOptimizedWorkout';
 import PhotoGallery from './components/client/PhotoGallery';
 import './App.css';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [showLogin, setShowLogin] = useState(true);
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'exercises', 'workouts', 'programs', 'create-workout', 'create-program', 'api-tester'
-  const [isMobile, setIsMobile] = useState(false);
+// Inner App component that uses context
+function AppContent() {
+  const { 
+    user, 
+    isAuthenticated, 
+    loading, 
+    currentView, 
+    isMobile, 
+    message,
+    login, 
+    logout, 
+    setCurrentView, 
+    setMessage 
+  } = useApp();
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    
+  // Add back the missing state for login/register tabs
+  const [showLogin, setShowLogin] = React.useState(true);
+
+  // Add back the missing useEffect for backend health check
+  React.useEffect(() => {
     // Test backend connection
-    fetch('http://localhost:5000/api/health')
+    fetch(`${process.env.REACT_APP_API_URL}/api/health`)
       .then(response => response.json())
       .then(data => {
         setMessage(data.message);
-        setLoading(false);
       })
       .catch(error => {
         console.error('Error:', error);
-        setLoading(false);
       });
-
-    // Detect mobile device
-    const checkMobile = () => {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isMobileDevice = /mobile|android|iphone|ipad|phone/i.test(userAgent);
-      const isSmallScreen = window.innerWidth <= 768;
-      setIsMobile(isMobileDevice || isSmallScreen);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   const handleLogin = (userData) => {
-    setUser(userData);
+    login(userData);
   };
 
   const handleRegister = (userData) => {
-    setUser(userData);
+    login(userData);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    setCurrentView('dashboard');
+    logout();
   };
 
   const navigateToCreateWorkout = () => {
@@ -333,6 +320,15 @@ function App() {
         )}
       </header>
     </div>
+  );
+}
+
+// Wrap the main App component with AppProvider
+function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 }
 

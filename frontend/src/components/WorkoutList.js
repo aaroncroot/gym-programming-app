@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import WorkoutCard from './WorkoutCard';
+import { API_BASE_URL } from '../config';
 
 function WorkoutList({ user, onCreateNew }) {
   const [workouts, setWorkouts] = useState([]);
@@ -8,42 +9,29 @@ function WorkoutList({ user, onCreateNew }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/workouts`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        setWorkouts(response.data.workouts || []);
+      } catch (error) {
+        console.error('Error fetching workouts:', error);
+      }
+    };
     fetchWorkouts();
   }, []);
 
-  const fetchWorkouts = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/workouts', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      // Handle new response structure
-      if (response.data.success) {
-        setWorkouts(response.data.data || []);
-      } else {
-        setWorkouts([]);
+  const handleDelete = async (workoutId) => {
+    if (window.confirm('Are you sure you want to delete this workout?')) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/workouts/${workoutId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        setWorkouts(workouts.filter(workout => workout._id !== workoutId));
+      } catch (error) {
+        console.error('Error deleting workout:', error);
       }
-    } catch (error) {
-      setError('Failed to fetch workouts');
-      console.error('Error fetching workouts:', error);
-      setWorkouts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteWorkout = async (workoutId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/workouts/${workoutId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setWorkouts(workouts.filter(workout => workout._id !== workoutId));
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to delete workout');
     }
   };
 
@@ -85,7 +73,7 @@ function WorkoutList({ user, onCreateNew }) {
               key={workout._id}
               workout={workout}
               user={user}
-              onDelete={handleDeleteWorkout}
+              onDelete={handleDelete}
             />
           ))
         )}

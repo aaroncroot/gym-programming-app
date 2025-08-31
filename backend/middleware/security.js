@@ -57,7 +57,7 @@ const corsOptions = {
 // Enhanced rate limiting for production
 const productionRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Stricter in production
+  max: process.env.NODE_ENV === 'production' ? 500 : 100, // Changed from 200 to 500
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: 900 // 15 minutes in seconds

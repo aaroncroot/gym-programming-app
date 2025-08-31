@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function ExerciseDetailsModal({ exercise, user, onClose, onExerciseUpdated }) {
   const [isEditingVideo, setIsEditingVideo] = useState(false);
@@ -10,7 +11,7 @@ function ExerciseDetailsModal({ exercise, user, onClose, onExerciseUpdated }) {
     try {
       setIsUpdatingVideo(true);
       const token = localStorage.getItem('token');
-      const response = await axios.put(`http://localhost:5000/api/exercises/${exercise._id}`, {
+      const response = await axios.put(`${API_BASE_URL}/api/exercises/${exercise._id}`, {
         videoUrl: videoUrl
       }, {
         headers: { Authorization: `Bearer ${token}` }

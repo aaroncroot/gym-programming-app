@@ -1,0 +1,61 @@
+/* TrueCoach-Inspired Color System */
+
+:root {
+    /* Primary Background Colors */
+    --bg-primary: #1e1e2e;        /* Main dark background */
+    --bg-secondary: #2a2a3e;      /* Secondary dark background */
+    --bg-tertiary: #313244;       /* Cards and elevated elements */
+    --bg-quaternary: #45475a;     /* Hover states and borders */
+    
+    /* Text Colors */
+    --text-primary: #ffffff;      /* Primary white text */
+    --text-secondary: #cdd6f4;    /* Secondary light text */
+    --text-tertiary: #a6adc8;     /* Muted text */
+    --text-disabled: #6c7086;     /* Disabled text */
+    
+    /* Accent Colors */
+    --accent-primary: #89b4fa;    /* Primary blue for buttons */
+    --accent-secondary: #74c7ec;  /* Secondary blue */
+    --accent-success: #a6e3a1;    /* Green for success */
+    --accent-warning: #f9e2af;    /* Yellow for warnings */
+    --accent-error: #f38ba8;      /* Red for errors */
+    --accent-info: #89dceb;       /* Cyan for info */
+    
+    /* Status Colors */
+    --status-green: #a6e3a1;      /* Good compliance */
+    --status-orange: #fab387;     /* Warning compliance */
+    --status-red: #f38ba8;        /* Poor compliance */
+    --status-pending: #f9e2af;    /* Pending invitations */
+    
+    /* Interactive Colors */
+    --hover-primary: #89b4fa;     /* Hover state for primary elements */
+    --hover-secondary: #74c7ec;   /* Hover state for secondary elements */
+    --active-primary: #74c7ec;    /* Active state for primary elements */
+    --active-secondary: #89b4fa;  /* Active state for secondary elements */
+    
+    /* Border Colors */
+    --border-primary: #45475a;    /* Primary borders */
+    --border-secondary: #313244;   /* Secondary borders */
+    --border-accent: #89b4fa;     /* Accent borders */
+    
+    /* Shadow Colors */
+    --shadow-primary: rgba(0, 0, 0, 0.3);    /* Primary shadows */
+    --shadow-secondary: rgba(0, 0, 0, 0.2);  /* Secondary shadows */
+    --shadow-accent: rgba(137, 180, 250, 0.2); /* Accent shadows */
+  }
+  
+  /* Dark Theme Overrides */
+  [data-theme="dark"] {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #2a2a3e;
+    --bg-tertiary: #313244;
+    --bg-quaternary: #45475a;
+  }
+  
+  /* Light Theme (if needed later) */
+  [data-theme="light"] {
+    --bg-primary: #fafafa;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #ffffff;
+    --bg-quaternary: #e0e0e0;
+  }

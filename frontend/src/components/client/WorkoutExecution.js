@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './WorkoutExecution.css';
+import { API_BASE_URL } from '../../config';
 
 const WorkoutExecution = ({ workout, onComplete, onBack }) => {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -63,10 +64,10 @@ const WorkoutExecution = ({ workout, onComplete, onBack }) => {
     try {
       setLoading(true);
       const [exerciseResponse, resultsResponse] = await Promise.all([
-        axios.get(`http://localhost:5000/api/exercises/${exerciseId}`, {
+        axios.get(`${API_BASE_URL}/api/exercises/${exerciseId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }),
-        axios.get(`http://localhost:5000/api/workouts/progress/${exerciseId}?limit=2`, {
+        axios.get(`${API_BASE_URL}/api/workouts/progress/${exerciseId}?limit=2`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
       ]);
@@ -84,7 +85,7 @@ const WorkoutExecution = ({ workout, onComplete, onBack }) => {
   const fetchExerciseHistory = async (exerciseId) => {
     try {
       setLoadingHistory(true);
-      const response = await axios.get(`http://localhost:5000/api/workouts/progress/${exerciseId}?limit=50`, {
+      const response = await axios.get(`${API_BASE_URL}/api/workouts/progress/${exerciseId}?limit=50`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setExerciseHistory(response.data.data || []);
@@ -147,7 +148,7 @@ const WorkoutExecution = ({ workout, onComplete, onBack }) => {
   const handleWorkoutComplete = async () => {
     try {
       // Log workout completion with set data
-      await axios.post('http://localhost:5000/api/workouts/log', {
+      await axios.post(`${API_BASE_URL}/api/workouts/log`, {
         workoutId: workout._id,
         exercises: workout.exercises.map((exercise, index) => ({
           exerciseId: exercise.exercise,
@@ -180,7 +181,7 @@ const WorkoutExecution = ({ workout, onComplete, onBack }) => {
     try {
       setSubmittingFeedback(true);
       
-      await axios.post('http://localhost:5000/api/workouts/feedback', {
+      await axios.post(`${API_BASE_URL}/api/workouts/feedback`, {
         workoutId: workout._id,
         feedback: feedback.trim(),
         rating: rating > 0 ? rating : null
@@ -255,7 +256,7 @@ const WorkoutExecution = ({ workout, onComplete, onBack }) => {
         formData.append('workoutTitle', workout.name);
         formData.append('description', `Workout feedback photo - ${new Date().toLocaleDateString()}`);
 
-        const response = await axios.post('/api/photos/upload', formData, {
+        const response = await axios.post(`${API_BASE_URL}/api/photos/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${localStorage.getItem('token')}`

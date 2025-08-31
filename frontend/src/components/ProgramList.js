@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import ProgramCard from './ProgramCard';
 
 function ProgramList({ user, onCreateNew }) {
@@ -8,42 +9,30 @@ function ProgramList({ user, onCreateNew }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/programs`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        setPrograms(response.data.programs || []);
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+      }
+    };
+
     fetchPrograms();
   }, []);
 
-  const fetchPrograms = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/programs', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      // Handle the new response structure
-      if (response.data.success) {
-        setPrograms(response.data.data || []);
-      } else {
-        setPrograms([]);
+  const handleDelete = async (programId) => {
+    if (window.confirm('Are you sure you want to delete this program?')) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/programs/${programId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        setPrograms(programs.filter(program => program._id !== programId));
+      } catch (error) {
+        console.error('Error deleting program:', error);
       }
-    } catch (error) {
-      setError('Failed to fetch programs');
-      console.error('Error fetching programs:', error);
-      setPrograms([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteProgram = async (programId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/programs/${programId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setPrograms(programs.filter(program => program._id !== programId));
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to delete program');
     }
   };
 
@@ -85,7 +74,7 @@ function ProgramList({ user, onCreateNew }) {
               key={program._id}
               program={program}
               user={user}
-              onDelete={handleDeleteProgram}
+              onDelete={handleDelete}
             />
           ))
         )}

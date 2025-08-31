@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function CreateProgram({ user, onBack }) {
   const [formData, setFormData] = useState({
@@ -23,6 +24,42 @@ function CreateProgram({ user, onBack }) {
   const [showPasteOption, setShowPasteOption] = useState(false);
 
   useEffect(() => {
+  const fetchWorkouts = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/workouts`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+        setAvailableWorkouts(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching workouts:', error);
+      setAvailableWorkouts([]);
+    }
+  };
+
+  const fetchExercises = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/exercises`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+        setAvailableExercises(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+      setAvailableExercises([]);
+    }
+  };
+
+  const fetchClients = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/users/clients`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+        setClients(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+      setClients([]);
+    }
+  };
+
     fetchWorkouts();
     fetchExercises();
     fetchClients();
@@ -32,60 +69,6 @@ function CreateProgram({ user, onBack }) {
   useEffect(() => {
     generateWeeksStructure();
   }, [formData.workoutsPerWeek, formData.duration]);
-
-  const fetchWorkouts = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/workouts', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.success) {
-        setAvailableWorkouts(response.data.data || []);
-      } else {
-        setAvailableWorkouts([]);
-      }
-    } catch (error) {
-      console.error('Error fetching workouts:', error);
-      setAvailableWorkouts([]);
-    }
-  };
-
-  const fetchExercises = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/exercises', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.success) {
-        setAvailableExercises(response.data.data || []);
-      } else {
-        setAvailableExercises([]);
-      }
-    } catch (error) {
-      console.error('Error fetching exercises:', error);
-      setAvailableExercises([]);
-    }
-  };
-
-  const fetchClients = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/users/clients', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.success) {
-        setClients(response.data.data || []);
-      } else {
-        setClients([]);
-      }
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      setClients([]);
-    }
-  };
 
   const generateWeeksStructure = () => {
     const { workoutsPerWeek, duration } = formData;
@@ -385,11 +368,14 @@ function CreateProgram({ user, onBack }) {
         workoutsPerWeek: formData.workoutsPerWeek,
         duration: formData.duration,
         workouts: workouts,
-        isTemplate: formData.isTemplate // NEW: Send template flag
+        isTemplate: formData.isTemplate
       };
 
-      const response = await axios.post('http://localhost:5000/api/programs', programData, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.post(`${API_BASE_URL}/api/programs`, programData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.data.success) {

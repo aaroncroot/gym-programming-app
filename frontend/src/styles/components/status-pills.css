@@ -1,0 +1,163 @@
+/* TrueCoach-Inspired Status Pills */
+
+/* Base Pill Styles */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--padding-xs) var(--padding-sm);
+    font-family: var(--font-primary);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-tight);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    user-select: none;
+    gap: var(--space-1);
+  }
+  
+  /* Status Variants */
+  .pill-success {
+    background-color: var(--status-green);
+    color: var(--bg-primary);
+  }
+  
+  .pill-warning {
+    background-color: var(--status-orange);
+    color: var(--bg-primary);
+  }
+  
+  .pill-error {
+    background-color: var(--status-red);
+    color: var(--text-primary);
+  }
+  
+  .pill-info {
+    background-color: var(--accent-info);
+    color: var(--bg-primary);
+  }
+  
+  .pill-pending {
+    background-color: var(--status-pending);
+    color: var(--bg-primary);
+  }
+  
+  .pill-neutral {
+    background-color: var(--bg-quaternary);
+    color: var(--text-secondary);
+  }
+  
+  /* Date Status Pills */
+  .pill-date-today {
+    background-color: var(--accent-warning);
+    color: var(--bg-primary);
+  }
+  
+  .pill-date-upcoming {
+    background-color: var(--accent-success);
+    color: var(--bg-primary);
+  }
+  
+  .pill-date-overdue {
+    background-color: var(--accent-error);
+    color: var(--text-primary);
+  }
+  
+  .pill-date-pending {
+    background-color: var(--status-pending);
+    color: var(--bg-primary);
+  }
+  
+  /* Compliance Rate Pills */
+  .pill-compliance {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+  }
+  
+  .pill-compliance .rate {
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: var(--font-bold);
+  }
+  
+  .pill-compliance .rate-7d {
+    background-color: var(--status-green);
+    color: var(--bg-primary);
+  }
+  
+  .pill-compliance .rate-30d {
+    background-color: var(--status-orange);
+    color: var(--bg-primary);
+  }
+  
+  .pill-compliance .rate-90d {
+    background-color: var(--status-red);
+    color: var(--text-primary);
+  }
+  
+  /* Program End Warning Pills */
+  .pill-warning-green {
+    background-color: var(--accent-success);
+    color: var(--bg-primary);
+  }
+  
+  .pill-warning-orange {
+    background-color: var(--accent-warning);
+    color: var(--bg-primary);
+  }
+  
+  .pill-warning-red {
+    background-color: var(--accent-error);
+    color: var(--text-primary);
+  }
+  
+  /* Interactive Pills */
+  .pill-interactive {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .pill-interactive:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--shadow-secondary);
+  }
+  
+  .pill-interactive:active {
+    transform: translateY(0);
+  }
+  
+  /* Pill with Icons */
+  .pill-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  
+  .pill-icon svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  
+  /* Pill Sizes */
+  .pill-sm {
+    padding: 2px var(--space-1);
+    font-size: 0.75rem;
+  }
+  
+  .pill-lg {
+    padding: var(--padding-sm) var(--padding-md);
+    font-size: var(--text-sm);
+  }
+  
+  /* Pill Groups */
+  .pill-group {
+    display: inline-flex;
+    gap: var(--space-1);
+  }
+  
+  .pill-group .pill {
+    margin: 0;
+  }

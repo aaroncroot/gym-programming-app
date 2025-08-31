@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ClientDashboard.css';
 import WorkoutExecution from './WorkoutExecution';
+import { API_BASE_URL } from '../../config';
 
 const ClientDashboard = ({ user }) => {
   const [assignedPrograms, setAssignedPrograms] = useState([]);
@@ -18,7 +19,7 @@ const ClientDashboard = ({ user }) => {
   const fetchAssignedPrograms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/programs', {
+      const response = await axios.get(`${API_BASE_URL}/api/programs`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

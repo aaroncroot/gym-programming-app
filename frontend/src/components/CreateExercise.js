@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function CreateExercise({ onClose, onExerciseCreated }) {
   const [formData, setFormData] = useState({
@@ -16,6 +17,10 @@ function CreateExercise({ onClose, onExerciseCreated }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -38,68 +43,68 @@ function CreateExercise({ onClose, onExerciseCreated }) {
     }
   };
 
-  const uploadVideo = async () => {
-    if (!selectedFile) return null;
-
+  const handleVideoUpload = async (file) => {
     const formData = new FormData();
-    formData.append('video', selectedFile);
+    formData.append('video', file);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/upload/video', formData, {
+      setUploading(true);
+      const response = await axios.post(`${API_BASE_URL}/api/upload/video`, formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      return response.data.videoPath;
+      setVideoUrl(response.data.videoPath);
+      setUploading(false);
     } catch (error) {
       console.error('Error uploading video:', error);
-      alert('Failed to upload video');
-      return null;
+      setUploading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setLoading(true);
+    setError('');
 
     try {
-      let finalVideoUrl = formData.videoUrl;
-      
-      // Upload file if selected
-      if (selectedFile) {
-        const uploadedPath = await uploadVideo();
-        if (uploadedPath) {
-          finalVideoUrl = uploadedPath;
-        } else {
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      const token = localStorage.getItem('token');
       const exerciseData = {
-        ...formData,
-        videoUrl: finalVideoUrl
+        name: formData.name,
+        category: formData.category,
+        muscleGroup: formData.muscleGroup,
+        equipment: formData.equipment,
+        difficulty: formData.difficulty,
+        videoUrl: videoUrl || formData.videoUrl, // Use uploaded video if available
+        instructions: formData.instructions.split('\n').filter(instruction => instruction.trim()),
+        isPublic: formData.isPublic,
+        isPrivate: formData.isPrivate
       };
 
-      await axios.post('http://localhost:5000/api/exercises', exerciseData, {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.post(`${API_BASE_URL}/api/exercises`, exerciseData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
       onExerciseCreated();
-      onClose();
+      setFormData({
+        name: '',
+        category: 'strength',
+        muscleGroup: 'chest',
+        equipment: 'bodyweight',
+        difficulty: 'beginner',
+        instructions: '',
+        videoUrl: '',
+        isPublic: true,
+        isPrivate: false
+      });
+      setSelectedFile(null);
+      setVideoUrl('');
     } catch (error) {
-      console.error('Error creating exercise:', error);
-      alert('Failed to create exercise');
+      setError(error.response?.data?.message || 'Failed to create exercise');
     } finally {
-      setIsSubmitting(false);
-      setUploadProgress(0);
+      setLoading(false);
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const ApiTester = () => {
   const [results, setResults] = useState({});
@@ -18,7 +19,7 @@ const ApiTester = () => {
   const fetchPrograms = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/programs', {
+      const response = await axios.get(`${API_BASE_URL}/api/programs`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPrograms(response.data.data || []);
@@ -30,7 +31,7 @@ const ApiTester = () => {
   const fetchClients = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/auth/users/clients', {
+      const response = await axios.get(`${API_BASE_URL}/api/auth/users/clients`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setClients(response.data.data || []);
@@ -47,7 +48,7 @@ const ApiTester = () => {
       const token = localStorage.getItem('token');
       const config = {
         method,
-        url: `http://localhost:5000${baseUrl}${endpoint}`,
+        url: `${API_BASE_URL}${baseUrl}${endpoint}`,
         headers: { Authorization: `Bearer ${token}` }
       };
       

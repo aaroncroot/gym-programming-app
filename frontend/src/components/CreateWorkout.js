@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 function CreateWorkout({ user, onBack }) {
   const [formData, setFormData] = useState({
@@ -19,7 +20,7 @@ function CreateWorkout({ user, onBack }) {
   const fetchExercises = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/exercises', {
+      const response = await axios.get(`${API_BASE_URL}/api/exercises`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -100,7 +101,7 @@ function CreateWorkout({ user, onBack }) {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await axios.post('http://localhost:5000/api/workouts', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/workouts`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
